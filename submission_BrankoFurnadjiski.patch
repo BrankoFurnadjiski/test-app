@@ -1,0 +1,919 @@
+diff --git a/App.tsx b/App.tsx
+index f8b946d..40f0197 100644
+--- a/App.tsx
++++ b/App.tsx
+@@ -1,20 +1,11 @@
+-import { StatusBar } from 'expo-status-bar';
+-import { StyleSheet, Text, View } from 'react-native';
++import { NavigationContainer } from '@react-navigation/native';
++
++import { MyTabs } from './src/navigation/MainTabs';
+ 
+ export default function App() {
+     return (
+-        <View style={styles.container}>
+-            <Text>Open up App.tsx to start working on your app!</Text>
+-            <StatusBar style="auto" />
+-        </View>
++        <NavigationContainer>
++            <MyTabs />
++        </NavigationContainer>
+     );
+ }
+-
+-const styles = StyleSheet.create({
+-    container: {
+-        flex: 1,
+-        backgroundColor: '#fff',
+-        alignItems: 'center',
+-        justifyContent: 'center',
+-    },
+-});
+diff --git a/app.json b/app.json
+index ad071ae..69810dd 100644
+--- a/app.json
++++ b/app.json
+@@ -1,28 +1,33 @@
+ {
+-    "expo": {
+-        "name": "ws-eng-react-native-assessment",
+-        "slug": "ws-eng-react-native-assessment",
+-        "version": "1.0.0",
+-        "orientation": "portrait",
+-        "icon": "./assets/icon.png",
+-        "userInterfaceStyle": "light",
+-        "splash": {
+-            "image": "./assets/splash.png",
+-            "resizeMode": "contain",
+-            "backgroundColor": "#ffffff"
+-        },
+-        "assetBundlePatterns": ["**/*"],
+-        "ios": {
+-            "supportsTablet": true
+-        },
+-        "android": {
+-            "adaptiveIcon": {
+-                "foregroundImage": "./assets/adaptive-icon.png",
+-                "backgroundColor": "#ffffff"
+-            }
+-        },
+-        "web": {
+-            "favicon": "./assets/favicon.png"
+-        }
+-    }
++  "expo": {
++    "name": "ws-eng-react-native-assessment",
++    "slug": "ws-eng-react-native-assessment",
++    "version": "1.0.0",
++    "orientation": "portrait",
++    "icon": "./assets/icon.png",
++    "userInterfaceStyle": "light",
++    "splash": {
++      "image": "./assets/splash.png",
++      "resizeMode": "contain",
++      "backgroundColor": "#ffffff"
++    },
++    "assetBundlePatterns": [
++      "**/*"
++    ],
++    "ios": {
++      "supportsTablet": true
++    },
++    "android": {
++      "adaptiveIcon": {
++        "foregroundImage": "./assets/adaptive-icon.png",
++        "backgroundColor": "#ffffff"
++      }
++    },
++    "web": {
++      "favicon": "./assets/favicon.png"
++    },
++    "plugins": [
++      "expo-router"
++    ]
++  }
+ }
+diff --git a/metro.config.js b/metro.config.js
+new file mode 100644
+index 0000000..f21efcd
+--- /dev/null
++++ b/metro.config.js
+@@ -0,0 +1,20 @@
++const { getDefaultConfig } = require('expo/metro-config');
++
++module.exports = (() => {
++    // eslint-disable-next-line no-undef
++    const config = getDefaultConfig(__dirname);
++
++    const { transformer, resolver } = config;
++
++    config.transformer = {
++        ...transformer,
++        babelTransformerPath: require.resolve('react-native-svg-transformer'),
++    };
++    config.resolver = {
++        ...resolver,
++        assetExts: resolver.assetExts.filter((ext) => ext !== 'svg'),
++        sourceExts: [...resolver.sourceExts, 'svg'],
++    };
++
++    return config;
++})();
+diff --git a/package.json b/package.json
+index 7e7b288..48f8763 100644
+--- a/package.json
++++ b/package.json
+@@ -1,28 +1,36 @@
+ {
+-    "name": "ws-eng-react-native-assessment",
+-    "version": "1.0.0",
+-    "main": "node_modules/expo/AppEntry.js",
+-    "scripts": {
+-        "start": "expo start",
+-        "android": "expo start --android",
+-        "ios": "expo start --ios",
+-        "web": "expo start --web",
+-        "format": "prettier --write .",
+-        "lint": "eslint ."
+-    },
+-    "dependencies": {
+-        "expo": "49.0.21",
+-        "expo-status-bar": "1.6.0",
+-        "react": "18.2.0",
+-        "react-native": "0.72.6"
+-    },
+-    "devDependencies": {
+-        "@babel/core": "7.23.5",
+-        "@types/react": "18.2.14",
+-        "eslint": "8.55.0",
+-        "eslint-config-universe": "12.0.0",
+-        "prettier": "3.1.0",
+-        "typescript": "5.1.3"
+-    },
+-    "private": true
+-}
++  "name": "ws-eng-react-native-assessment",
++  "version": "1.0.0",
++  "main": "node_modules/expo/AppEntry.js",
++  "scripts": {
++    "start": "expo start",
++    "android": "expo start --android",
++    "ios": "expo start --ios",
++    "web": "expo start --web",
++    "format": "prettier --write .",
++    "lint": "eslint ."
++  },
++  "dependencies": {
++    "expo": "49.0.21",
++    "expo-constants": "~14.4.2",
++    "expo-linking": "~5.0.2",
++    "expo-router": "^2.0.0",
++    "expo-status-bar": "~1.6.0",
++    "react": "18.2.0",
++    "react-native": "0.72.6",
++    "react-native-gesture-handler": "~2.12.0",
++    "react-native-safe-area-context": "4.6.3",
++    "react-native-screens": "~3.22.0",
++    "react-native-svg": "13.9.0",
++    "react-native-svg-transformer": "^1.3.0"
++  },
++  "devDependencies": {
++    "@babel/core": "7.23.5",
++    "@types/react": "18.2.14",
++    "eslint": "8.55.0",
++    "eslint-config-universe": "12.0.0",
++    "prettier": "3.1.0",
++    "typescript": "5.1.3"
++  },
++  "private": true
++}
+\ No newline at end of file
+diff --git a/assets/activity.svg b/src/assets/activity.svg
+similarity index 100%
+rename from assets/activity.svg
+rename to src/assets/activity.svg
+diff --git a/assets/bookmark.svg b/src/assets/bookmark.svg
+similarity index 88%
+rename from assets/bookmark.svg
+rename to src/assets/bookmark.svg
+index c937298..ec972a9 100644
+--- a/assets/bookmark.svg
++++ b/src/assets/bookmark.svg
+@@ -1,3 +1,3 @@
+ <svg xmlns="http://www.w3.org/2000/svg" width="31" height="30" viewBox="0 0 31 30" fill="none">
+-  <path d="M4.5 4.98512C4.5 3.88877 5.39543 3 6.5 3H24.5C25.6046 3 26.5 3.88877 26.5 4.98512V26.0058C26.5 26.7891 25.6289 27.2637 24.9631 26.8432L16.0369 21.2051C15.7093 20.9982 15.2907 20.9982 14.9631 21.2051L6.03688 26.8432C5.37115 27.2637 4.5 26.7891 4.5 26.0058V4.98512Z" fill="white"/>
++  <path d="M4.5 4.98512C4.5 3.88877 5.39543 3 6.5 3H24.5C25.6046 3 26.5 3.88877 26.5 4.98512V26.0058C26.5 26.7891 25.6289 27.2637 24.9631 26.8432L16.0369 21.2051C15.7093 20.9982 15.2907 20.9982 14.9631 21.2051L6.03688 26.8432C5.37115 27.2637 4.5 26.7891 4.5 26.0058V4.98512Z" fill="currentColor"/>
+ </svg>
+\ No newline at end of file
+diff --git a/assets/comment.svg b/src/assets/comment.svg
+similarity index 100%
+rename from assets/comment.svg
+rename to src/assets/comment.svg
+diff --git a/assets/correct.gif b/src/assets/correct.gif
+similarity index 100%
+rename from assets/correct.gif
+rename to src/assets/correct.gif
+diff --git a/assets/discover.svg b/src/assets/discover.svg
+similarity index 100%
+rename from assets/discover.svg
+rename to src/assets/discover.svg
+diff --git a/assets/heart.svg b/src/assets/heart.svg
+similarity index 100%
+rename from assets/heart.svg
+rename to src/assets/heart.svg
+diff --git a/assets/home.svg b/src/assets/home.svg
+similarity index 100%
+rename from assets/home.svg
+rename to src/assets/home.svg
+diff --git a/assets/playlist.svg b/src/assets/playlist.svg
+similarity index 100%
+rename from assets/playlist.svg
+rename to src/assets/playlist.svg
+diff --git a/assets/profile.svg b/src/assets/profile.svg
+similarity index 100%
+rename from assets/profile.svg
+rename to src/assets/profile.svg
+diff --git a/src/assets/scroll.png b/src/assets/scroll.png
+new file mode 100644
+index 0000000..fd301b1
+Binary files /dev/null and b/src/assets/scroll.png differ
+diff --git a/assets/search.svg b/src/assets/search.svg
+similarity index 100%
+rename from assets/search.svg
+rename to src/assets/search.svg
+diff --git a/assets/share.svg b/src/assets/share.svg
+similarity index 100%
+rename from assets/share.svg
+rename to src/assets/share.svg
+diff --git a/assets/wrong.gif b/src/assets/wrong.gif
+similarity index 100%
+rename from assets/wrong.gif
+rename to src/assets/wrong.gif
+diff --git a/src/components/PreviewQuestion.tsx b/src/components/PreviewQuestion.tsx
+new file mode 100644
+index 0000000..4d50d84
+--- /dev/null
++++ b/src/components/PreviewQuestion.tsx
+@@ -0,0 +1,152 @@
++import Icons from '@expo/vector-icons/FontAwesome';
++import React, { useCallback, useState } from 'react';
++import { StyleSheet, View, Text, ImageBackground, SafeAreaView, LayoutRectangle } from 'react-native';
++
++import { AnswerQuestionType, PreviewQuestionAnswer } from './PreviewQuestionAnswer';
++import Playlist from '../assets/playlist.svg';
++import { getDataAnswer } from '../data/service';
++import { AnswerItem, Item } from '../data/types';
++
++export function getType(
++    answer: AnswerItem | undefined,
++    correct: AnswerItem | undefined,
++    current: AnswerItem,
++): AnswerQuestionType {
++    if (!correct || !answer) {
++        return 'unanswered';
++    }
++
++    if (correct.id === current.id) {
++        return 'correct';
++    }
++    if (answer.id === current.id) {
++        return 'incorrect';
++    }
++    return 'unanswered';
++}
++
++export function PreviewQuestion({ item, layout }: { item: Item; layout: LayoutRectangle }) {
++    const { width, height } = layout;
++    const [answer, setAnswer] = useState<AnswerItem | undefined>();
++    const [correct, setCorrect] = useState<AnswerItem | undefined>();
++
++    const [description, hash] = item.description.split('#');
++
++    const onPress = useCallback(
++        (res: AnswerItem) => {
++            console.log(res);
++            getDataAnswer(item.id).then((values) => setCorrect(values.correct_options[0]));
++            setAnswer(res);
++        },
++        [item.id],
++    );
++
++    return (
++        <ImageBackground source={{ uri: item.image }} src={item.image} style={[styles.flex, { width, height }]}>
++            <SafeAreaView style={styles.content}>
++                <View style={[styles.questions]}>
++                    <Text style={styles.questionText}>{item.question}</Text>
++                </View>
++
++                <View style={[styles.flex, styles.end]}>
++                    {item.options.map((current) => (
++                        <PreviewQuestionAnswer
++                            key={current.id}
++                            answer={current}
++                            answered={answer !== undefined}
++                            onPress={onPress}
++                            type={getType(answer, correct, current)}
++                        />
++                    ))}
++                </View>
++
++                <View style={styles.top}>
++                    <Text style={styles.userText}>{item.user.name}</Text>
++                    <Text style={styles.descriptionText}>
++                        {description}
++                        <Text style={styles.descriptionHash}>#{hash}</Text>
++                    </Text>
++                </View>
++                <View style={styles.playlist}>
++                    <View style={styles.playlistWrap}>
++                        <Playlist />
++                        <Text style={styles.playlistText}>Playlist • Unit 5: {item.playlist}</Text>
++                    </View>
++
++                    <Icons name="chevron-right" size={14} color="white" />
++                </View>
++            </SafeAreaView>
++        </ImageBackground>
++    );
++}
++
++const styles = StyleSheet.create({
++    content: {
++        marginHorizontal: 20,
++        flex: 1,
++        paddingRight: 50,
++    },
++    questions: {
++        backgroundColor: '#000000A0',
++        padding: 8,
++        borderRadius: 8,
++        marginTop: 120,
++    },
++    questionText: {
++        fontSize: 22,
++        lineHeight: 26,
++        letterSpacing: 0,
++        textAlign: 'left',
++        fontWeight: '500',
++        color: '#FFF',
++    },
++    flex: {
++        flex: 1,
++    },
++    end: {
++        justifyContent: 'flex-end',
++    },
++    userText: {
++        color: '#FFFFFF',
++        fontSize: 15,
++        fontWeight: '600',
++        lineHeight: 18,
++        letterSpacing: 0,
++        textAlign: 'left',
++    },
++    descriptionText: {
++        color: '#FFFFFF',
++        fontSize: 13,
++        lineHeight: 16,
++        letterSpacing: 0,
++        textAlign: 'left',
++        fontWeight: '400',
++    },
++    descriptionHash: {
++        fontWeight: '700',
++    },
++    playlist: {
++        backgroundColor: '#1E1E1E',
++        paddingVertical: 10,
++        paddingHorizontal: 20,
++        marginLeft: -20,
++        marginRight: -70,
++        flexDirection: 'row',
++        alignItems: 'center',
++        justifyContent: 'space-between',
++    },
++    playlistWrap: {
++        flexDirection: 'row',
++        alignItems: 'center',
++    },
++    playlistText: {
++        color: '#FFFFFF',
++        fontSize: 14,
++        fontWeight: '700',
++        marginLeft: 6,
++    },
++    top: {
++        marginTop: 20,
++        marginBottom: 12,
++    },
++});
+diff --git a/src/components/PreviewQuestionAnswer.tsx b/src/components/PreviewQuestionAnswer.tsx
+new file mode 100644
+index 0000000..d4fc029
+--- /dev/null
++++ b/src/components/PreviewQuestionAnswer.tsx
+@@ -0,0 +1,110 @@
++import React, { useCallback, useEffect, useRef } from 'react';
++import { Animated, Pressable, StyleSheet, Image, Text } from 'react-native';
++
++import { AnswerItem } from '../data/types';
++import { useLayout } from '../hooks/useLayout';
++
++export type AnswerQuestionType = 'correct' | 'incorrect' | 'unanswered';
++
++export function PreviewQuestionAnswer({
++    answer,
++    type,
++    onPress,
++    answered,
++}: {
++    answer: AnswerItem;
++    type: AnswerQuestionType;
++    onPress: (answer: AnswerItem) => void;
++    answered: boolean;
++}) {
++    const { onLayout, layout, done } = useLayout();
++    const left = useRef(new Animated.Value(0)).current; // Initial value for opacity: 0
++    const opacity = done ? 1 : 0;
++
++    const backgroundColor: Record<AnswerQuestionType, string> = {
++        correct: '#28B18FB2',
++        incorrect: '#DC5F5FB2',
++        unanswered: 'transparent',
++    };
++
++    const onSelect = useCallback(() => {
++        onPress(answer);
++    }, [answer, onPress]);
++
++    useEffect(() => {
++        if (type === 'correct' || type === 'incorrect') {
++            Animated.timing(left, {
++                toValue: 0,
++                duration: 450,
++                useNativeDriver: false,
++            }).start();
++        }
++    }, [left, type]);
++
++    useEffect(() => {
++        if (done) {
++            left.setValue(layout.width);
++        }
++    }, [done, layout.width, left]);
++
++    return (
++        <Pressable style={styles.answer} onLayout={onLayout} onPress={onSelect} disabled={answered}>
++            <Animated.View
++                style={[
++                    StyleSheet.absoluteFillObject,
++                    {
++                        width: layout.width,
++                        height: layout.height,
++                        opacity,
++                        left,
++                        backgroundColor: backgroundColor[type],
++                    },
++                ]}>
++                <Image
++                    style={[styles.image, type === 'incorrect' ? styles.rotate : styles.rotateY]}
++                    resizeMode="contain"
++                    source={type === 'incorrect' ? require('../assets/wrong.gif') : require('../assets/correct.gif')}
++                />
++            </Animated.View>
++            <Text style={styles.answerText}>{answer.answer}</Text>
++        </Pressable>
++    );
++}
++
++const styles = StyleSheet.create({
++    answer: {
++        backgroundColor: '#FFFFFF80',
++        padding: 16,
++        borderRadius: 8,
++        marginVertical: 4,
++        overflow: 'hidden',
++    },
++    answerText: {
++        fontSize: 17,
++        fontWeight: '500',
++        lineHeight: 20,
++        letterSpacing: 0,
++        textAlign: 'left',
++        color: '#FFF',
++        textShadowOffset: {
++            width: 2,
++            height: 2,
++        },
++        textShadowColor: '#000000',
++        textShadowRadius: 3,
++        paddingRight: 40,
++    },
++    image: {
++        width: 40,
++        height: '100%',
++        top: 0,
++        right: 10,
++        position: 'absolute',
++    },
++    rotate: {
++        transform: [{ rotate: '180deg' }],
++    },
++    rotateY: {
++        transform: [{ rotateY: '180deg' }],
++    },
++});
+diff --git a/src/components/SocialSection.tsx b/src/components/SocialSection.tsx
+new file mode 100644
+index 0000000..37e3748
+--- /dev/null
++++ b/src/components/SocialSection.tsx
+@@ -0,0 +1,48 @@
++import React from 'react';
++import { StyleSheet, Text, View, Image } from 'react-native';
++
++import Bookmark from '../assets/bookmark.svg';
++import Comment from '../assets/comment.svg';
++import Heart from '../assets/heart.svg';
++import Share from '../assets/share.svg';
++
++export function SocialSection() {
++    return (
++        <View style={styles.content}>
++            <Image source={require('../assets/scroll.png')} style={styles.image} resizeMode="contain" />
++            <Heart />
++            <Text style={styles.text}>87</Text>
++            <Comment />
++            <Text style={styles.text}>3</Text>
++            <Bookmark color="#FFFFFF" />
++            <Text style={styles.text}>203</Text>
++            <Share />
++            <Text style={styles.text}>17</Text>
++        </View>
++    );
++}
++
++const styles = StyleSheet.create({
++    content: {
++        position: 'absolute',
++        bottom: 35,
++        right: 14,
++        flexDirection: 'column',
++        alignItems: 'center',
++        justifyContent: 'center',
++    },
++    text: {
++        fontSize: 12,
++        fontWeight: '500',
++        lineHeight: 14,
++        letterSpacing: -0.16,
++        textAlign: 'center',
++        marginBottom: 16,
++        color: '#FFFFFF',
++    },
++    image: {
++        width: 44,
++        height: 44,
++        marginBottom: 16,
++    },
++});
+diff --git a/src/components/YouHeader.tsx b/src/components/YouHeader.tsx
+new file mode 100644
+index 0000000..846d37b
+--- /dev/null
++++ b/src/components/YouHeader.tsx
+@@ -0,0 +1,86 @@
++import Icons from '@expo/vector-icons/FontAwesome';
++import React, { useEffect, useState } from 'react';
++import { StyleSheet, Text, View } from 'react-native';
++
++import Activity from '../assets/activity.svg';
++import Search from '../assets/search.svg';
++
++export function PreviewQuestionHeader() {
++    const [time, setTime] = useState(0);
++
++    useEffect(() => {
++        const id = setInterval(() => setTime((t) => t + 1), 60 * 1000);
++
++        return () => clearInterval(id);
++    }, []);
++
++    return (
++        <View style={styles.header}>
++            <View style={[styles.row, styles.size]}>
++                <Activity />
++                <Text style={styles.time}>{time}m</Text>
++            </View>
++            <View style={styles.col}>
++                <Text style={styles.text}>For You</Text>
++                <View style={styles.line} />
++            </View>
++            <View style={[styles.size, styles.icon]}>
++                <Search />
++            </View>
++        </View>
++    );
++}
++
++const styles = StyleSheet.create({
++    header: {
++        flexDirection: 'row',
++        alignItems: 'center',
++        height: 42,
++        position: 'absolute',
++        left: 20,
++        right: 20,
++        top: 60,
++    },
++    text: {
++        fontSize: 16,
++        fontWeight: '600',
++        lineHeight: 22,
++        letterSpacing: -0.16,
++        textAlign: 'center',
++        color: '#FFFFFF',
++    },
++    line: {
++        width: 35,
++        height: 4,
++        marginTop: 4,
++        backgroundColor: '#FFFFFF',
++    },
++    col: {
++        flex: 1,
++        flexDirection: 'column',
++        alignItems: 'center',
++        justifyContent: 'center',
++    },
++    row: {
++        flex: 0,
++        flexDirection: 'row',
++        alignItems: 'center',
++        justifyContent: 'center',
++    },
++    time: {
++        marginLeft: 8,
++        fontSize: 14,
++        lineHeight: 17,
++        fontWeight: '400',
++        letterSpacing: 0,
++        textAlign: 'left',
++        color: '#FFFFFF99',
++    },
++    size: {
++        width: 40,
++    },
++    icon: {
++        alignItems: 'flex-end',
++        justifyContent: 'flex-end',
++    },
++});
+diff --git a/src/data/service.ts b/src/data/service.ts
+new file mode 100644
+index 0000000..7b9b368
+--- /dev/null
++++ b/src/data/service.ts
+@@ -0,0 +1,9 @@
++import { QuestionAnswers } from './types';
++
++export function getDataAnswer(id: number): Promise<QuestionAnswers> {
++    return fetch(`https://cross-platform.rp.devfactory.com/reveal?id=${id}`).then((res) => res.json());
++}
++
++export function getData() {
++    return fetch('https://cross-platform.rp.devfactory.com/for_you').then((data) => data.json());
++}
+diff --git a/src/data/types.ts b/src/data/types.ts
+new file mode 100644
+index 0000000..0043602
+--- /dev/null
++++ b/src/data/types.ts
+@@ -0,0 +1,36 @@
++export type AnswerItem = {
++    id: string;
++    answer: string;
++};
++
++export type QuestionAnswers = {
++    id: number;
++    correct_options: AnswerItem[];
++};
++
++export type Item = {
++    type: string;
++    id: number;
++    playlist: string;
++    description: string;
++    question: string;
++    image: string;
++    options: [
++        {
++            id: string;
++            answer: string;
++        },
++        {
++            id: string;
++            answer: string;
++        },
++        {
++            id: string;
++            answer: string;
++        },
++    ];
++    user: {
++        name: string;
++        avatar: string;
++    };
++};
+diff --git a/src/declarations.d.ts b/src/declarations.d.ts
+new file mode 100644
+index 0000000..dcae957
+--- /dev/null
++++ b/src/declarations.d.ts
+@@ -0,0 +1,6 @@
++declare module '*.svg' {
++    import React from 'react';
++    import { SvgProps } from 'react-native-svg';
++    const content: React.FC<SvgProps>;
++    export default content;
++}
+diff --git a/src/hooks/useLayout.ts b/src/hooks/useLayout.ts
+new file mode 100644
+index 0000000..cd9a174
+--- /dev/null
++++ b/src/hooks/useLayout.ts
+@@ -0,0 +1,19 @@
++import { useState, useCallback } from 'react';
++import { LayoutRectangle, LayoutChangeEvent } from 'react-native';
++
++export function useLayout() {
++    const [done, setDone] = useState(false);
++    const [layout, setLayout] = useState<LayoutRectangle>({
++        x: 0,
++        y: 0,
++        width: 0,
++        height: 0,
++    });
++
++    const onLayout = useCallback((event: LayoutChangeEvent) => {
++        setLayout(event.nativeEvent.layout);
++        setDone(true);
++    }, []);
++
++    return { onLayout, done, layout };
++}
+diff --git a/src/navigation/MainTabs.tsx b/src/navigation/MainTabs.tsx
+new file mode 100644
+index 0000000..f270745
+--- /dev/null
++++ b/src/navigation/MainTabs.tsx
+@@ -0,0 +1,83 @@
++import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
++import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
++
++import Activity from '../assets/activity.svg';
++import Bookmark from '../assets/bookmark.svg';
++import Discover from '../assets/discover.svg';
++import Home from '../assets/home.svg';
++import Profile from '../assets/profile.svg';
++import { PreviewQuestionList } from '../screens/PreviewQuestionList';
++
++const Tab = createBottomTabNavigator();
++
++function TabIcon({ label, opacity = true, children }: { label: string; opacity?: boolean; children: React.ReactNode }) {
++    return (
++        <TouchableOpacity style={[styles.item]} accessibilityRole="button" accessibilityState={{ selected: !opacity }}>
++            {children}
++            <Text style={[styles.text, opacity && styles.opacity]}>{label}</Text>
++        </TouchableOpacity>
++    );
++}
++
++function MyTabBar() {
++    return (
++        <View style={[styles.flex, styles.content]}>
++            <TabIcon opacity={false} label="Home">
++                <Home />
++            </TabIcon>
++            <TabIcon label="Discover">
++                <Discover />
++            </TabIcon>
++            <TabIcon label="Activity">
++                <Activity />
++            </TabIcon>
++            <TabIcon label="Bookmark">
++                <Bookmark color="#FFFFFF66" />
++            </TabIcon>
++            <TabIcon label="Profile">
++                <Profile />
++            </TabIcon>
++        </View>
++    );
++}
++
++export function MyTabs() {
++    return (
++        <Tab.Navigator tabBar={MyTabBar}>
++            <Tab.Screen name="Home" component={PreviewQuestionList} options={{ headerShown: false }} />
++        </Tab.Navigator>
++    );
++}
++
++const styles = StyleSheet.create({
++    flex: {
++        display: 'flex',
++        alignItems: 'center',
++        justifyContent: 'space-around',
++        flexDirection: 'row',
++        padding: 8,
++    },
++    item: {
++        display: 'flex',
++        alignItems: 'center',
++        justifyContent: 'center',
++        height: 48,
++    },
++    text: {
++        fontSize: 10,
++        fontWeight: '500',
++        lineHeight: 12,
++        letterSpacing: 0,
++        textAlign: 'center',
++        color: '#ffffff',
++        marginTop: 4,
++    },
++    opacity: {
++        opacity: 0.4,
++    },
++    content: {
++        backgroundColor: '#000000',
++        borderTopColor: '##FFFFFF33',
++        borderWidth: 0.33,
++    },
++});
+diff --git a/src/screens/PreviewQuestionList.tsx b/src/screens/PreviewQuestionList.tsx
+new file mode 100644
+index 0000000..f6c68d6
+--- /dev/null
++++ b/src/screens/PreviewQuestionList.tsx
+@@ -0,0 +1,48 @@
++import React, { useCallback, useEffect, useState } from 'react';
++import { FlatList, View } from 'react-native';
++
++import { PreviewQuestion } from '../components/PreviewQuestion';
++import { SocialSection } from '../components/SocialSection';
++import { PreviewQuestionHeader } from '../components/YouHeader';
++import { getData } from '../data/service';
++import { Item } from '../data/types';
++import { useLayout } from '../hooks/useLayout';
++
++export function PreviewQuestionList() {
++    const [data, setData] = useState<Item[]>([]);
++    const { onLayout, done, layout } = useLayout();
++
++    useEffect(() => {
++        Promise.all([getData(), getData()]).then(setData);
++    }, []);
++
++    const onEnd = useCallback(() => {
++        getData().then((newItem) => setData((arr) => [...arr, newItem]));
++    }, []);
++
++    return (
++        <View style={{ position: 'relative', flex: 1 }}>
++            <FlatList
++                style={{ flex: 1 }}
++                onLayout={onLayout}
++                data={done ? data : []}
++                keyExtractor={(value, index) => index.toString()}
++                decelerationRate="fast"
++                snapToInterval={layout.height}
++                snapToAlignment="start"
++                renderItem={(value) => <PreviewQuestion item={value.item} layout={layout} />}
++                keyboardShouldPersistTaps="always"
++                onEndReached={onEnd}
++                onEndReachedThreshold={0.7}
++                bounces={false}
++            />
++
++            {done && (
++                <>
++                    <PreviewQuestionHeader />
++                    <SocialSection />
++                </>
++            )}
++        </View>
++    );
++}
+diff --git a/tsconfig.json b/tsconfig.json
+index 09d2dae..d6eb699 100644
+--- a/tsconfig.json
++++ b/tsconfig.json
+@@ -3,4 +3,4 @@
+     "compilerOptions": {
+         "strict": true
+     }
+-}
++}
+\ No newline at end of file
